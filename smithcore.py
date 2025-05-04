@@ -2,9 +2,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from hybrid_brain import smith_brain
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # 🔓 Allow cross-origin requests (from your browser/mobile HTML interface)
+CORS(app)  # Enable cross-origin requests
 
 core_memory = {
     "system": "SmithCore AI Execution Engine",
@@ -23,10 +28,11 @@ def root():
 def execute():
     data = request.get_json()
     task = data.get("task", "undefined")
+    smart_reply = smith_brain(task)
     return jsonify({
         "status": "executed",
         "task": task,
-        "response": f"SmithCore executed the task: {task}"
+        "response": smart_reply
     })
 
 @app.route("/report", methods=["GET"])
@@ -51,4 +57,3 @@ def blackbox():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
