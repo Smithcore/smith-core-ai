@@ -1,28 +1,24 @@
+from flask import Flask, request, jsonify
 import os
-from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Core Memory (simulated seed)
 core_memory = {
     "system": "SmithCore AI Execution Engine",
-    "version": "v1.0",
-    "status": "operational"
+    "version": "v1.0"
 }
 
-# Endpoint: Health Check
 @app.route("/", methods=["GET"])
-def home():
+def root():
     return jsonify({
         "message": "SmithCore is alive.",
         "status": "ok",
         "endpoints": ["/execute", "/report", "/blackbox"]
     })
 
-# Endpoint: Execute
 @app.route("/execute", methods=["POST"])
 def execute():
-    data = request.json
+    data = request.get_json()
     task = data.get("task", "undefined")
     return jsonify({
         "status": "executed",
@@ -30,7 +26,6 @@ def execute():
         "response": f"SmithCore executed the task: {task}"
     })
 
-# Endpoint: Report
 @app.route("/report", methods=["GET"])
 def report():
     return jsonify({
@@ -39,11 +34,10 @@ def report():
         "version": core_memory["version"],
         "details": {
             "background_processes": "active",
-            "last_deploy": "auto",
+            "last_deploy": "auto"
         }
     })
 
-# Endpoint: Blackbox Memory Dump
 @app.route("/blackbox", methods=["GET"])
 def blackbox():
     return jsonify({
@@ -54,4 +48,5 @@ def blackbox():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
