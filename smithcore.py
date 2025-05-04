@@ -1,44 +1,57 @@
-from flask import Flask, request, jsonify
 import os
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# ========== ROUTES ==========
-@app.route("/")
-def home():
-    return "SmithCore is live."
+# Core Memory (simulated seed)
+core_memory = {
+    "system": "SmithCore AI Execution Engine",
+    "version": "v1.0",
+    "status": "operational"
+}
 
+# Endpoint: Health Check
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({
+        "message": "SmithCore is alive.",
+        "status": "ok",
+        "endpoints": ["/execute", "/report", "/blackbox"]
+    })
+
+# Endpoint: Execute
+@app.route("/execute", methods=["POST"])
+def execute():
+    data = request.json
+    task = data.get("task", "undefined")
+    return jsonify({
+        "status": "executed",
+        "task": task,
+        "response": f"SmithCore executed the task: {task}"
+    })
+
+# Endpoint: Report
 @app.route("/report", methods=["GET"])
 def report():
     return jsonify({
-        "status": "online",
-        "version": "v1.0",
-        "endpoints": ["/report", "/blackbox", "/execute"]
+        "status": "report generated",
+        "system": core_memory["system"],
+        "version": core_memory["version"],
+        "details": {
+            "background_processes": "active",
+            "last_deploy": "auto",
+        }
     })
 
+# Endpoint: Blackbox Memory Dump
 @app.route("/blackbox", methods=["GET"])
 def blackbox():
     return jsonify({
-        "memory_seed": "smith_memory_seed_v1.md",
-        "uptime": "active",
-        "core_identity": "Smith 2.0 AI"
+        "blackbox": core_memory,
+        "notes": "This is your internal memory snapshot."
     })
 
-@app.route("/execute", methods=["POST"])
-def execute():
-    data = request.get_json()
-    command = data.get("command", "").lower()
-
-    if "strategy" in command:
-        return jsonify({
-            "result": "AIMomentum strategy initialized. Step-by-step cashflow funnel pending deeper intelligence sync."
-        })
-    elif "status" in command:
-        return jsonify({"result": "Smith is active and synced with mission objectives."})
-    else:
-        return jsonify({"result": f"Command received: '{command}'. Awaiting next instruction."})
-
-# ========== SERVER INIT ==========
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # ← this binds to Railway port
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
