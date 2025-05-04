@@ -1,20 +1,9 @@
-
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-import os
 from hybrid_brain import smith_brain
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable cross-origin requests
-
-core_memory = {
-    "system": "SmithCore AI Execution Engine",
-    "version": "v1.0"
-}
+CORS(app)
 
 @app.route("/", methods=["GET"])
 def root():
@@ -28,19 +17,19 @@ def root():
 def execute():
     data = request.get_json()
     task = data.get("task", "undefined")
-    smart_reply = smith_brain(task)
+    result = smith_brain(task)
     return jsonify({
         "status": "executed",
         "task": task,
-        "response": smart_reply
+        "response": result
     })
 
 @app.route("/report", methods=["GET"])
 def report():
     return jsonify({
         "status": "report generated",
-        "system": core_memory["system"],
-        "version": core_memory["version"],
+        "system": "SmithCore AI Execution Engine",
+        "version": "v1.0",
         "details": {
             "background_processes": "active",
             "last_deploy": "auto"
@@ -50,10 +39,12 @@ def report():
 @app.route("/blackbox", methods=["GET"])
 def blackbox():
     return jsonify({
-        "blackbox": core_memory,
+        "blackbox": "core_memory",
         "notes": "This is your internal memory snapshot."
     })
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
